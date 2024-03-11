@@ -1,0 +1,14 @@
+global:
+  # -- Default domain used by all components
+  ## Used for ingresses, certificates, SSO, notifications, etc.
+  domain: argocd
+
+  additionalLabels:
+    app: argo-cd
+  addPrometheusAnnotations: true
+
+  affinity:
+    podAntiAffinity: none
+    nodeAffinity:
+      type: none
+
