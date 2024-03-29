@@ -1,24 +1,17 @@
+{{/* vim: set filetype=mustache: */}}
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "monitoring-stack.name" -}}
+{{- define "alertmanager.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
-
-{{/*
-Generate subcharts main services' names
-*/}}
-{{- define "promehteus.service.name" -}}
-{{- printf "%s-%s" .Release.Name "prometheus-server" }}
-{{-  end }}
-
 
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "monitoring-stack.fullname" -}}
+{{- define "alertmanager.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -34,18 +27,18 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "monitoring-stack.chart" -}}
+{{- define "alertmanager.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "monitoring-stack.labels" -}}
-helm.sh/chart: {{ include "monitoring-stack.chart" . }}
-{{ include "monitoring-stack.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- define "alertmanager.labels" -}}
+helm.sh/chart: {{ include "alertmanager.chart" . }}
+{{ include "alertmanager.selectorLabels" . }}
+{{- with .Chart.AppVersion }}
+app.kubernetes.io/version: {{ . | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
@@ -53,18 +46,47 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "monitoring-stack.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "monitoring-stack.name" . }}
+{{- define "alertmanager.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "alertmanager.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "monitoring-stack.serviceAccountName" -}}
+{{- define "alertmanager.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "monitoring-stack.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "alertmanager.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Define Ingress apiVersion
+*/}}
+{{- define "alertmanager.ingress.apiVersion" -}}
+{{- printf "networking.k8s.io/v1" }}
+{{- end }}
+
+{{/*
+Define Pdb apiVersion
+*/}}
+{{- define "alertmanager.pdb.apiVersion" -}}
+{{- if $.Capabilities.APIVersions.Has "policy/v1/PodDisruptionBudget" }}
+{{- printf "policy/v1" }}
+{{- else }}
+{{- printf "policy/v1beta1" }}
+{{- end }}
+{{- end }}
+
+{{/*
+Allow overriding alertmanager namespace
+*/}}
+{{- define "alertmanager.namespace" -}}
+{{- if .Values.namespaceOverride -}}
+{{- .Values.namespaceOverride -}}
+{{- else -}}
+{{- .Release.Namespace -}}
+{{- end -}}
+{{- end -}}

@@ -1,0 +1,9 @@
+# /* prometheus chart config */
+prometheus:
+  server:
+    persistentVolume:
+      enabled: true
+    service:
+      type: NodePort
+      nodePort: 30090
+  extraScrapeConfigs: ""
