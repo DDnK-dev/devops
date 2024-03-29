@@ -7,3 +7,14 @@ prometheus:
       type: NodePort
       nodePort: 30090
   extraScrapeConfigs: ""
+
+# /* grafana chart config */
+grafana:
+  service:
+    type: NodePort
+    nodePort: 30080
+  persistence:
+    type: pvc
+    enabled: true
+  adminUser: admin
+  adminPassword: admin
