@@ -3,7 +3,4 @@ expose:
   tls:
     auto:
       commonName: "harbor.ddnk-dev.org"
-
-
 externalURL: https://192.168.65.4
-
